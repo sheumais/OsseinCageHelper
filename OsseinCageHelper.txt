@@ -1,0 +1,15 @@
+## Title: Ossein Cage Helper
+## Author: TheMrPancake
+## Version: 1.0
+## APIVersion: 101046
+## DependsOn: CombatAlerts LibAddonMenu-2.0
+## OptionalDependsOn: OdySupportIcons
+## SavedVariables: OCHSavedVariables
+
+modules/Common.lua
+modules/Shapers.lua
+modules/Twins.lua
+modules/Kazpian.lua
+OsseinCageHelperUtil.lua
+OsseinCageHelperUI.lua
+OsseinCageHelper.lua
