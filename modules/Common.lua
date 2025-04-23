@@ -25,6 +25,10 @@ OCH.Common.DodgeIDs = {
     [236473] = { -3, 2 }, -- Ethereal Burst
     [245140] = { -3, 1 }, -- Incinerating Bolt
     [245131] = { -3, 1 }, -- Sparking Bolt
+    [234678] = { -2, 2 }, -- Jagged Claw
+    [234634] = { -2, 2 }, -- Burning Jaws
+    [236356] = { -2, 2 }, -- Swipe
+    [236379] = { -2, 2 }, -- Bat
 }
 
 OCH.Common.constants = {
@@ -40,9 +44,7 @@ end
 
 function OCH.Common.Init()
   OCH.Common.castSources = {}
-  OCH.Common.carrionStacks = {}
-  OCH.Common.playerCarrionStacks = 0
-  OCH.Common.maxCarrionStacks = 0
+  OCH.Common.ResetCarrionStacks()
 end
 
 function OCH.Common.ProcessInterrupts(result, targetUnitId) 
@@ -51,22 +53,26 @@ function OCH.Common.ProcessInterrupts(result, targetUnitId)
     end
 end
 
+function OCH.Common.ResetCarrionStacks()
+    OCH.Common.carrionStacks = {}
+    OCH.Common.playerCarrionStacks = 0
+    OCH.Common.maxCarrionStacks = 0
+end
+
 function OCH.Common.CausticCarrion(changeType, stackCount, unitTag)
     local borderId = "caustic_carrion"
     local is_player = AreUnitsEqual(unitTag, "player")
+    EVENT_MANAGER:UnregisterForUpdate(OCH.name .. "CarrionTimeout")
 
     if changeType == EFFECT_RESULT_GAINED or changeType == EFFECT_RESULT_UPDATED then
         OCH.Common.carrionStacks[unitTag] = stackCount
         if is_player then
             CombatAlerts.ScreenBorderEnable(0x007FFF55, 3000, borderId)
-            OCHStatusLabelCommon1:SetHidden(false)
         end
     elseif changeType == EFFECT_RESULT_FADED then
         OCH.Common.carrionStacks[unitTag] = 0
         if is_player then
             CombatAlerts.ScreenBorderDisable(borderId)
-            OCHStatusLabelCommon1:SetHidden(true)
-            OCHStatusLabelCommon1Value:SetHidden(true)
         end
     end
 
@@ -78,4 +84,5 @@ function OCH.Common.CausticCarrion(changeType, stackCount, unitTag)
         end
     end
     OCHStatusLabelCommon1Value:SetText(zo_strformat("<<1>> (<<2>>)", OCH.Common.playerCarrionStacks, OCH.Common.maxCarrionStacks))
+    EVENT_MANAGER:RegisterForUpdate(OCH.name .. "CarrionTimeout", 3000, OCH.Common.ResetCarrionStacks)
 end

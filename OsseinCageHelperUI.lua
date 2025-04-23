@@ -2,7 +2,7 @@ OCH = OCH or {}
 local OCH = OCH
 
 OCH.prefix = "|c007FFF[OCH]:|r "
-OCH.debugMode = 3
+OCH.debugMode = 0
 
 function OCH:Trace(debugLevel, ...)
     if debugLevel <= OCH.debugMode then

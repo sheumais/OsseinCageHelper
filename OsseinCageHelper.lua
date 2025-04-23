@@ -2,8 +2,7 @@ OCH = OCH or {}
 local OCH = OCH
 
 OCH.name = "OsseinCageHelper"
-OCH.version = "v0.1"
-OCH.debug = false
+OCH.version = "v0.2"
 OCH.status = {
     isHMBoss = false,
     isShapers = false,
@@ -57,13 +56,15 @@ function OCH.CombatEvent(eventCode, result, isError, abilityName, abilityGraphic
 
     -- Handle events
     if abilityId == OCH.Kazpian.constants.tether_initial then
-        OCH.Kazpian.DominatorsChains()
+        OCH.Kazpian.DominatorsChains(result, hitValue)
     elseif abilityId == OCH.Kazpian.constants.sword_pulse then
         OCH.Kazpian.SwordPulseSpawn(result, hitValue, targetUnitId)
     elseif abilityId == OCH.Kazpian.constants.sword_cones then
         OCH.Kazpian.SwordConesSpawn(result, hitValue, targetUnitId)
     elseif abilityId == OCH.Twins.constants.titanic_clash_jynorah or abilityId == OCH.Twins.constants.titanic_clash_skorkhif then
         OCH.Twins.TitanicClash(result, hitValue)
+    elseif abilityId == OCH.Twins.constants.myrinax_spawn or abilityId == OCH.Twins.constants.valneer_spawn then
+        OCH.Twins.DragonLanding(result, hitValue)
     end
 end
 
