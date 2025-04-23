@@ -2,6 +2,7 @@ OCH = OCH or {}
 local OCH = OCH
 
 OCH.name = "OsseinCageHelper"
+OCH.version = "v0.1"
 OCH.debug = false
 OCH.status = {
     isHMBoss = false,
@@ -29,33 +30,18 @@ function OCH.EffectChanged(eventCode, changeType, effectSlot, effectName, unitTa
     -- EFFECT_RESULT_GAINED = 1
     -- EFFECT_RESULT_FADED = 2
     -- EFFECT_RESULT_UPDATED = 3
+
+    if abilityId == OCH.Common.constants.caustic_carrion_id then
+        OCH.Common.CausticCarrion(changeType, stackCount, unitTag)
+    elseif abilityId == OCH.Common.constants.caustic_carrion_id2 then
+        OCH.Common.CausticCarrion(changeType, stackCount, unitTag)
+    end
 end
 
 local DEBUG_EVENT = 3
 
 function OCH.CombatEvent(eventCode, result, isError, abilityName, abilityGraphic, abilityActionSlotType, sourceName, sourceType, targetName, targetType, hitValue, powerType, damageType, log, sourceUnitId, targetUnitId, abilityId, overflow)
-    -- local eventLog = {
-    --     timestamp = GetTimeStamp(),
-    --     eventCode = eventCode,
-    --     result = result,
-    --     isError = isError,
-    --     abilityName = abilityName,
-    --     abilityGraphic = abilityGraphic,
-    --     abilityActionSlotType = abilityActionSlotType,
-    --     sourceName = sourceName,
-    --     sourceType = sourceType,
-    --     targetName = targetName,
-    --     targetType = targetType,
-    --     hitValue = hitValue,
-    --     powerType = powerType,
-    --     damageType = damageType,
-    --     log = log,
-    --     sourceUnitId = sourceUnitId,
-    --     targetUnitId = targetUnitId,
-    --     abilityId = abilityId,
-    --     overflow = overflow
-    -- }
-    -- table.insert(OCH.sV.dataExport, eventLog)
+    
     if DEBUG_EVENT <= OCH.debugMode then
         if result == ACTION_RESULT_BEGIN and sourceType == COMBAT_UNIT_TYPE_NONE then
             local displaySourceName = sourceName or GetUnitDisplayName(OCH.GetTagForId(sourceUnitId)) or ""
@@ -70,8 +56,14 @@ function OCH.CombatEvent(eventCode, result, isError, abilityName, abilityGraphic
     OCH.Common.ProcessInterrupts(result, targetUnitId)
 
     -- Handle events
-    if abilityId == OCH.Common.constants.caustic_carrion_id then
-        OCH.Common.CausticCarrion(result, targetType, targetUnitId, hitValue)
+    if abilityId == OCH.Kazpian.constants.tether_initial then
+        OCH.Kazpian.DominatorsChains()
+    elseif abilityId == OCH.Kazpian.constants.sword_pulse then
+        OCH.Kazpian.SwordPulseSpawn(result, hitValue, targetUnitId)
+    elseif abilityId == OCH.Kazpian.constants.sword_cones then
+        OCH.Kazpian.SwordConesSpawn(result, hitValue, targetUnitId)
+    elseif abilityId == OCH.Twins.constants.titanic_clash_jynorah or abilityId == OCH.Twins.constants.titanic_clash_skorkhif then
+        OCH.Twins.TitanicClash(result, hitValue)
     end
 end
 
@@ -125,8 +117,9 @@ function OCH.PlayerActivated(e, initial)
     EVENT_MANAGER:UnregisterForEvent(OCH.name .. "CombatEvent", EVENT_COMBAT_EVENT )
     EVENT_MANAGER:UnregisterForEvent(OCH.name .. "Buffs", EVENT_EFFECT_CHANGED )
 
-    -- if GetZoneId(GetUnitZoneIndex("player")) ~= OCH.data.osseinCageID then return end
-    if OCH.debug then d("Registering for Ossein Cage events") end
+    OCHStatusLabelAddonName:SetText("Ossein Cage Helper " .. OCH.version)
+    if GetZoneId(GetUnitZoneIndex("player")) ~= OCH.data.osseinCageID then return end
+    if OCH.debugMode then d("Registering for Ossein Cage events") end
 
     EVENT_MANAGER:RegisterForEvent(OCH.name .. "BossChange", EVENT_BOSSES_CHANGED, OCH.BossesChanged)
     EVENT_MANAGER:RegisterForEvent(OCH.name .. "CombatEvent", EVENT_COMBAT_EVENT, OCH.CombatEvent)
@@ -137,9 +130,11 @@ local function OnAddOnLoaded(_, name)
     if name ~= OCH.name then return end
     EVENT_MANAGER:UnregisterForEvent(OCH.name, EVENT_ADD_ON_LOADED)
     OCH.sV = ZO_SavedVars:NewAccountWide("OCHSavedVariables", 1, nil, {})
-    OCH.sV.dataExport = OCH.sV.dataExport or {}
+    OCH.sV.combatEvents = OCH.sV.combatEvents or {}
+    OCH.sV.effects = OCH.sV.effects or {}
     OCH.Common.AddToCCADodgeList()
     OCH.Common.Init()
+    OCH.RestorePosition()
     EVENT_MANAGER:RegisterForEvent(OCH.name .. "PlayerActived", EVENT_PLAYER_ACTIVATED, OCH.PlayerActivated)
 end
 

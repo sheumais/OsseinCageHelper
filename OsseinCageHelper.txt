@@ -6,6 +6,7 @@
 ## OptionalDependsOn: OdySupportIcons
 ## SavedVariables: OCHSavedVariables
 
+OsseinCageHelper.xml
 modules/Common.lua
 modules/Shapers.lua
 modules/Twins.lua

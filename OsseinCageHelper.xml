@@ -1,0 +1,27 @@
+<GuiXml>
+    <Controls>
+        <TopLevelControl name="OCHStatus" mouseEnabled="true" movable="true" clampedToScreen="true">
+            <Dimensions x="500" y="200" />
+            <Anchor point="BOTTOM" relativeTo="GuiRoot" relativePoint="CENTER" offsetY="-150" offsetX="600" />
+            <OnMoveStop>OCH.OnOCHStatusMove()</OnMoveStop>
+            <Controls>
+                <Label name="$(parent)LabelAddonName" font="EsoUI/Common/Fonts/univers67.otf|16|soft-shadow-thick" color="FFFFFF" text="Ossein Cage Helper" verticalAlignment="CENTER" horizontalAlignment="LEFT" alpha="0.85">
+                    <Dimensions x="600" y="50" />
+                    <Anchor point="CENTER" relativeTo="$(parent)" relativePoint="CENTER" offsetY="-30"/>
+                </Label>
+                <Texture name="$(parent)Divider" textureFile="/esoui/art/miscellaneous/horizontaldivider.dds">
+                    <Dimensions x="270" y="4"/>
+                    <Anchor point="CENTER" relativeTo="$(parent)" relativePoint="CENTER" offsetY="-20" offsetX="-210"/>
+                </Texture>
+                <Label name="$(parent)LabelCommon1" font="ZoFontWinH1" color="007FFF" text="Caustic Carrion:" verticalAlignment="CENTER" horizontalAlignment="LEFT" alpha="0.85">
+                    <Dimensions x="600" y="50" />
+                    <Anchor point="CENTER" relativeTo="$(parent)" relativePoint="CENTER" offsetY="0"/>
+                </Label>
+                <Label name="$(parent)LabelCommon1Value" font="ZoFontWinH1" color="007FFF" text="" verticalAlignment="CENTER" horizontalAlignment="LEFT" alpha="0.85">
+                    <Dimensions x="600" y="50" />
+                    <Anchor point="CENTER" relativeTo="$(parent)" relativePoint="CENTER" offsetY="0" offsetX="230"/>
+                </Label>
+            </Controls>
+        </TopLevelControl>
+    </Controls>
+</GuiXml>
