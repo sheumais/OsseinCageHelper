@@ -21,6 +21,14 @@
                     <Dimensions x="600" y="50" />
                     <Anchor point="CENTER" relativeTo="$(parent)" relativePoint="CENTER" offsetY="0" offsetX="230"/>
                 </Label>
+                <Label name="$(parent)LabelTwins1" font="ZoFontWinH1" color="FF5555" text="Titanic Clash:" verticalAlignment="CENTER" horizontalAlignment="LEFT" alpha="0.85">
+                    <Dimensions x="600" y="50" />
+                    <Anchor point="CENTER" relativeTo="$(parent)" relativePoint="CENTER" offsetY="40"/>
+                </Label>
+                <Label name="$(parent)LabelTwins1Value" font="ZoFontWinH1" color="FF5555" text="" verticalAlignment="CENTER" horizontalAlignment="LEFT" alpha="0.85">
+                    <Dimensions x="600" y="50" />
+                    <Anchor point="CENTER" relativeTo="$(parent)" relativePoint="CENTER" offsetY="40" offsetX="230"/>
+                </Label>
             </Controls>
         </TopLevelControl>
     </Controls>

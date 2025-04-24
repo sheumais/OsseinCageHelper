@@ -2,13 +2,19 @@ OCH = OCH or {}
 local OCH = OCH
 
 OCH.prefix = "|c007FFF[OCH]:|r "
-OCH.debugMode = 0
+OCH.debugMode = 3
 
 function OCH:Trace(debugLevel, ...)
     if debugLevel <= OCH.debugMode then
       local message = zo_strformat(...)
       d(OCH.prefix .. message)
     end
+end
+
+function OCH.ClearUIOutOfCombat()
+    OCH.status.inCombat = false
+    OCH.Common.ResetCarrionStacks()
+    OCH.Twins.Init()
 end
 
 function OCH.OnOCHStatusMove()
@@ -21,6 +27,8 @@ function OCH.HideAllUI(hide)
     OCHStatusLabelTop:SetHidden(hide)
     OCHStatusLabelCommon1:SetHidden(hide)
     OCHStatusLabelCommon1Value:SetHidden(hide)
+    OCHStatusLabelTwins1:SetHidden(hide)
+    OCHStatusLabelTwins1Value:SetHidden(hide)
 end
 
 function OCH.RestorePosition()

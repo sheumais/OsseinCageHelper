@@ -23,28 +23,31 @@ OCH.Common.DodgeIDs = {
     [236569] = { -2, 1 }, -- Spectral Revenge
     [239158] = { -3, 1, true}, -- Taking Aim
     [236473] = { -3, 2 }, -- Ethereal Burst
+    [236458] = { -3, 1 }, -- Potent Ethereal Burst
     [245140] = { -3, 1 }, -- Incinerating Bolt
     [245131] = { -3, 1 }, -- Sparking Bolt
     [234678] = { -2, 2 }, -- Jagged Claw
     [234634] = { -2, 2 }, -- Burning Jaws
     [236356] = { -2, 2 }, -- Swipe
     [236379] = { -2, 2 }, -- Bat
+    -- [232397] = { 3000, 2}, -- Effluvial Expellant
 }
 
 OCH.Common.constants = {
     caustic_carrion_id = 241089,
     caustic_carrion_id2 = 240708,
+    abduct = 233762,
 }
 
 function OCH.Common.AddToCCADodgeList()
     for k, v in pairs(OCH.Common.DodgeIDs) do
-      CombatAlertsData.dodge.ids[k] = v
+        CombatAlertsData.dodge.ids[k] = v
     end
 end
 
 function OCH.Common.Init()
-  OCH.Common.castSources = {}
-  OCH.Common.ResetCarrionStacks()
+    OCH.Common.castSources = {}
+    OCH.Common.ResetCarrionStacks()
 end
 
 function OCH.Common.ProcessInterrupts(result, targetUnitId) 
@@ -54,9 +57,14 @@ function OCH.Common.ProcessInterrupts(result, targetUnitId)
 end
 
 function OCH.Common.ResetCarrionStacks()
+    EVENT_MANAGER:UnregisterForUpdate(OCH.name .. "CarrionTimeout")
+    local borderId = "caustic_carrion"
     OCH.Common.carrionStacks = {}
     OCH.Common.playerCarrionStacks = 0
     OCH.Common.maxCarrionStacks = 0
+    CombatAlerts.ScreenBorderDisable(borderId)
+    OCHStatusLabelCommon1:SetHidden(true)
+    OCHStatusLabelCommon1Value:SetHidden(true)
 end
 
 function OCH.Common.CausticCarrion(changeType, stackCount, unitTag)
@@ -66,13 +74,10 @@ function OCH.Common.CausticCarrion(changeType, stackCount, unitTag)
 
     if changeType == EFFECT_RESULT_GAINED or changeType == EFFECT_RESULT_UPDATED then
         OCH.Common.carrionStacks[unitTag] = stackCount
+        OCHStatusLabelCommon1:SetHidden(false)
+        OCHStatusLabelCommon1Value:SetHidden(false)
         if is_player then
             CombatAlerts.ScreenBorderEnable(0x007FFF55, 3000, borderId)
-        end
-    elseif changeType == EFFECT_RESULT_FADED then
-        OCH.Common.carrionStacks[unitTag] = 0
-        if is_player then
-            CombatAlerts.ScreenBorderDisable(borderId)
         end
     end
 

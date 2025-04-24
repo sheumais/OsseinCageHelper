@@ -1,9 +1,9 @@
 ## Title: Ossein Cage Helper
 ## Author: TheMrPancake
-## Version: 1.0
+## Version: 3
 ## APIVersion: 101046
 ## DependsOn: CombatAlerts LibAddonMenu-2.0
-## OptionalDependsOn: OdySupportIcons
+## OptionalDependsOn: OdySupportIcons CrutchAlerts
 ## SavedVariables: OCHSavedVariables
 
 OsseinCageHelper.xml
