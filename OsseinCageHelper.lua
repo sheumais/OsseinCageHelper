@@ -68,7 +68,7 @@ function OCH.CombatEvent(eventCode, result, isError, abilityName, abilityGraphic
         end
     end
 
-    OCH.Common.ProcessInterrupts(result, targetUnitId)
+    -- OCH.Common.ProcessInterrupts(result, targetUnitId) -- currently broken idk im just gonna disable it because it's not very useful anyway. TODO
 
     -- Handle events
     if abilityId == OCH.Kazpian.constants.sword_pulse then
@@ -196,7 +196,7 @@ local function OnAddOnLoaded(_, name)
     OCH.sV.combatEvents = OCH.sV.combatEvents or {}
     OCH.sV.effects = OCH.sV.effects or {}
     OCH.Common.AddToCCADodgeList()
-    OCH.Common.Init()
+    OCH.ClearUIOutOfCombat()
     OCH.RestorePosition()
     EVENT_MANAGER:RegisterForEvent(OCH.name .. "PlayerActived", EVENT_PLAYER_ACTIVATED, OCH.PlayerActivated)
 end
