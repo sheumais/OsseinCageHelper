@@ -2,7 +2,7 @@ OCH = OCH or {}
 local OCH = OCH
 
 OCH.prefix = "|c007FFF[OCH]:|r "
-OCH.debugMode = 3
+OCH.debugMode = 0
 
 function OCH:Trace(debugLevel, ...)
     if debugLevel <= OCH.debugMode then
@@ -12,7 +12,9 @@ function OCH:Trace(debugLevel, ...)
 end
 
 function OCH.ClearUIOutOfCombat()
+    OCH.HideAllUI(true)
     OCH.status.inCombat = false
+    OCH.ResetAllPlayerIcons()
     OCH.Common.ResetCarrionStacks()
     OCH.Twins.Init()
 end
@@ -24,7 +26,6 @@ end
 
 function OCH.HideAllUI(hide)
     OCHStatus:SetHidden(hide)
-    OCHStatusLabelTop:SetHidden(hide)
     OCHStatusLabelCommon1:SetHidden(hide)
     OCHStatusLabelCommon1Value:SetHidden(hide)
     OCHStatusLabelTwins1:SetHidden(hide)

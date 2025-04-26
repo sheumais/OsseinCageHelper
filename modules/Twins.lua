@@ -12,16 +12,16 @@ OCH.Twins.constants = {
     blazeforged_fortification = 234507, -- conjurer shield
     titanic_clash_jynorah = 232316, -- fly away id
     titanic_clash_skorkhif = 232317, -- fly away id
-    titanic_clash_start = 232375, -- start of fire breath
     myrinax_spawn = 233477, -- dropping into arena
     valneer_spawn = 233489, -- dropping into arena
-    titanic_clash_length = 30, -- 30 seconds from titanic_clash_start cast
+    titanic_clash_length = 35, -- 35 seconds from fly away to beam hit
     myrinax_color = {51, 153, 255, 217},
     myrinax_hex = 0x3399FFD9,
     valneer_color = {255, 87, 51, 217},
     valneer_hex = 0xFF5733D9,
     reflective_scales_valneer = 233330, -- damage to player by dragon from dots
     reflective_scales_myrinax = 233321, -- damage to player by dragon from dots
+    -- surge kite timer like lt dan
 }
 
 function OCH.Twins.Init()
@@ -75,15 +75,15 @@ function OCH.Twins.DragonLanding(result, hitValue)
     end
 end
 
-function OCH.Twins.ReflectiveScalesValneer(result, hitValue, targetUnitId)
-    if result == ACTION_RESULT_BEGIN and hitValue > 500 and AreUnitsEqual(targetUnitId, "player") then
+function OCH.Twins.ReflectiveScalesValneer(result, hitValue, targetName)
+    if result == ACTION_RESULT_DAMAGE and hitValue > 500 and targetName == OCH.playerRawName then
         CombatAlerts.Alert(nil, "Reflective Scales", OCH.Twins.constants.valneer_hex, nil, hitValue)
         LibCombatAlerts.PlaySounds("SCRYING_ACTIVATE_BOMB", 2, nil)
     end
 end
 
-function OCH.Twins.ReflectiveScalesMyrinax(result, hitValue, targetUnitId)
-    if result == ACTION_RESULT_BEGIN and hitValue > 500 and AreUnitsEqual(targetUnitId, "player") then
+function OCH.Twins.ReflectiveScalesMyrinax(result, hitValue, targetName)
+    if result == ACTION_RESULT_DAMAGE and hitValue > 500 and targetName == OCH.playerRawName then
         CombatAlerts.Alert(nil, "Reflective Scales", OCH.Twins.constants.myrinax_hex, nil, hitValue)
         LibCombatAlerts.PlaySounds("SCRYING_ACTIVATE_BOMB", 2, nil)
     end
@@ -98,12 +98,13 @@ function OCH.Twins.TitanicClashUpdateTick(timeSec)
     timeLeft = OCH.Twins.constants.titanic_clash_length - delta
     OCHStatusLabelTwins1Value:SetText(OCH.GetSecondsRemainingString(timeLeft))
 
-    if delta > (OCH.Twins.constants.titanic_clash_length + 5) then
+    if delta > (OCH.Twins.constants.titanic_clash_length + 5) then -- little extra wiggle room for people to get off pad
         OCH.Twins.titanicClashActive = false
         OCH.Common.ResetCarrionStacks()
     end
 end
 
+-- /script d(OCH.Twins.titanicClashActive)
 function OCH.Twins.UpdateTick(timeSec)
     if OCH.Twins.titanicClashActive then 
         LCHStatus:SetHidden(false)

@@ -2,7 +2,7 @@ OCH = OCH or {}
 local OCH = OCH
 
 OCH.name = "OsseinCageHelper"
-OCH.version = "v0.3"
+OCH.version = "v0.4"
 OCH.status = {
     isHMBoss = false,
     isShapers = false,
@@ -36,13 +36,13 @@ function OCH.EffectChanged(eventCode, changeType, effectSlot, effectName, unitTa
     elseif abilityId == OCH.Common.constants.caustic_carrion_id2 then
         OCH.Common.CausticCarrion(changeType, stackCount, unitTag)
     elseif abilityId == OCH.Kazpian.constants.tether_a_predebuff then
-
+        OCH.Kazpian.DominatorsChainsInitial(changeType, unitTag)
     elseif abilityId == OCH.Kazpian.constants.tether_b_predebuff then
-
+        OCH.Kazpian.DominatorsChainsInitial(changeType, unitTag)
     elseif abilityId == OCH.Kazpian.constants.tether_b_actual then
-
+        OCH.Kazpian.DominatorsChainsTether(changeType, unitTag)
     elseif abilityId == OCH.Kazpian.constants.tether_a_actual then
-        
+        OCH.Kazpian.DominatorsChainsTether(changeType, unitTag)
     end
 end
 
@@ -52,10 +52,32 @@ local ignoredAbilityIds = {
     [193398] = true, --pragmatic fatecarver
     [193397] = true, --exhausting fatecarver
     [183006] = true, --cephaliarch's flail
+    [16420] = true, -- heavy attack DW
+    [16261] = true, -- heavy attack Ice
+    [15383] = true, -- HA fire
 }
 
 function OCH.CombatEvent(eventCode, result, isError, abilityName, abilityGraphic, abilityActionSlotType, sourceName, sourceType, targetName, targetType, hitValue, powerType, damageType, log, sourceUnitId, targetUnitId, abilityId, overflow)
     
+    -- table.insert(OCH.sV.combatEvents, {
+    --     timestamp = GetTimeStamp(),
+    --     eventCode = eventCode,
+    --     result = result,
+    --     isError = isError,
+    --     abilityName = abilityName,
+    --     abilityId = abilityId,
+    --     hitValue = hitValue,
+    --     sourceName = sourceName,
+    --     sourceType = sourceType,
+    --     targetName = targetName,
+    --     targetType = targetType,
+    --     sourceUnitId = sourceUnitId,
+    --     targetUnitId = targetUnitId,
+    --     powerType = powerType,
+    --     damageType = damageType,
+    --     overflow = overflow
+    -- })
+
     if DEBUG_EVENT <= OCH.debugMode then
         if not ignoredAbilityIds[abilityId] then
             if result == ACTION_RESULT_BEGIN and sourceType == COMBAT_UNIT_TYPE_NONE then
@@ -83,12 +105,12 @@ function OCH.CombatEvent(eventCode, result, isError, abilityName, abilityGraphic
         OCH.Twins.TitanicClash(result, hitValue)
     elseif abilityId == OCH.Twins.constants.myrinax_spawn or abilityId == OCH.Twins.constants.valneer_spawn then
         OCH.Twins.DragonLanding(result, hitValue)
-    elseif abilityId == OCH.Twins.constants.titanic_clash_start then
+    elseif abilityId == OCH.Twins.constants.titanic_clash_jynorah or abilityId == OCH.Twins.constants.titanic_clash_skorkhif then
         OCH.Twins.TitanClashTimer(result, hitValue)
     elseif abilityId == OCH.Twins.constants.reflective_scales_myrinax then
-        OCH.Twins.ReflectiveScalesMyrinax(result, hitValue, targetUnitId)
+        OCH.Twins.ReflectiveScalesMyrinax(result, hitValue, targetName)
     elseif abilityId == OCH.Twins.constants.reflective_scales_valneer then
-        OCH.Twins.ReflectiveScalesValneer(result, hitValue, targetUnitId)
+        OCH.Twins.ReflectiveScalesValneer(result, hitValue, targetName)
     end
 end
 
@@ -96,7 +118,32 @@ function OCH.DeathState(event, unitTag, isDead)
     if unitTag == "player" and not isDead and not IsUnitInCombat("boss1") then
       OCH.ClearUIOutOfCombat()
     end
-  end
+end
+
+function OCH.CombatState(eventCode, inCombat)
+    local currentTargetHP, maxTargetHP, effmaxTargetHP = GetUnitPower("boss1", POWERTYPE_HEALTH)
+    -- Do not change combat state if you are dead, or the boss is not full.
+    -- Do not do anything outside of boss fights.
+    if maxTargetHP == 0 or maxTargetHP == nil then
+        OCH.ClearUIOutOfCombat()
+        return
+    end
+    if currentTargetHP < 0.99*maxTargetHP or IsUnitDead("player") then
+        return
+    end
+    if inCombat then
+        OCH.status.inCombat = true
+        OCH.ResetStatus()
+        OCH.BossesChanged()
+    else
+        OCH.ClearUIOutOfCombat()
+    end
+end
+
+function OCH.ResetStatus()
+    OCH.Common.Init()
+    OCH.Twins.Init()
+end
 
 function OCH.GetBossName()
     for i = 1,MAX_BOSSES do
@@ -170,7 +217,7 @@ function OCH.UpdateTick(gameTimeMs)
     --   OCH.Kazpian.UpdateTick(timeSec)
     end
   
-  end
+end
 
 
 function OCH.PlayerActivated(e, initial)
@@ -178,15 +225,20 @@ function OCH.PlayerActivated(e, initial)
     EVENT_MANAGER:UnregisterForEvent(OCH.name .. "CombatEvent", EVENT_COMBAT_EVENT )
     EVENT_MANAGER:UnregisterForEvent(OCH.name .. "Buffs", EVENT_EFFECT_CHANGED )
     EVENT_MANAGER:UnregisterForEvent(OCH.name .. "DeathState", EVENT_UNIT_DEATH_STATE_CHANGED, OCH.DeathState)
+    EVENT_MANAGER:UnregisterForEvent(OCH.name .. "CombatState", EVENT_PLAYER_COMBAT_STATE, OCH.CombatState)
+    EVENT_MANAGER:UnregisterForUpdate(OCH.name.."UpdateTick")
 
     OCHStatusLabelAddonName:SetText("Ossein Cage Helper " .. OCH.version)
     if GetZoneId(GetUnitZoneIndex("player")) ~= OCH.data.osseinCageID then return end
     if OCH.debugMode then d("Registering for Ossein Cage events") end
+    OCH.BossesChanged()
 
     EVENT_MANAGER:RegisterForEvent(OCH.name .. "BossChange", EVENT_BOSSES_CHANGED, OCH.BossesChanged)
     EVENT_MANAGER:RegisterForEvent(OCH.name .. "CombatEvent", EVENT_COMBAT_EVENT, OCH.CombatEvent)
     EVENT_MANAGER:RegisterForEvent(OCH.name .. "Buffs", EVENT_EFFECT_CHANGED, OCH.EffectChanged)
     EVENT_MANAGER:RegisterForEvent(OCH.name .. "DeathState", EVENT_UNIT_DEATH_STATE_CHANGED, OCH.DeathState)
+    EVENT_MANAGER:RegisterForEvent(OCH.name .. "CombatState", EVENT_PLAYER_COMBAT_STATE, OCH.CombatState)
+    EVENT_MANAGER:RegisterForUpdate(OCH.name.. "UpdateTick", 100, OCH.UpdateTick)
 end
 
 local function OnAddOnLoaded(_, name)
@@ -195,6 +247,7 @@ local function OnAddOnLoaded(_, name)
     OCH.sV = ZO_SavedVars:NewAccountWide("OCHSavedVariables", 1, nil, {})
     OCH.sV.combatEvents = OCH.sV.combatEvents or {}
     OCH.sV.effects = OCH.sV.effects or {}
+    OCH.playerRawName = GetRawUnitName("player")
     OCH.Common.AddToCCADodgeList()
     OCH.ClearUIOutOfCombat()
     OCH.RestorePosition()

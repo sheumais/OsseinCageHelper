@@ -1,6 +1,11 @@
 OCH = OCH or {}
 local OCH = OCH
-OCH.Common = {}
+OCH.Common = {
+    castSources = {},
+    carrionStacks = {},
+    playerCarrionStacks = 0,
+    maxCarrionStacks = 0,
+}
 
 --[[ Options ---------------------------------------
 1: Size of alert window
@@ -24,8 +29,8 @@ OCH.Common.DodgeIDs = {
     [239158] = { -3, 1, true}, -- Taking Aim
     [236473] = { -3, 2 }, -- Ethereal Burst
     [236458] = { -3, 1 }, -- Potent Ethereal Burst
-    [245140] = { -3, 1 }, -- Incinerating Bolt
-    [245131] = { -3, 1 }, -- Sparking Bolt
+    [245140] = { 2000, 1 }, -- Incinerating Bolt
+    [245131] = { 2000, 1 }, -- Sparking Bolt
     [234678] = { -2, 2 }, -- Jagged Claw
     [234634] = { -2, 2 }, -- Burning Jaws
     [236356] = { -2, 2 }, -- Swipe
@@ -46,8 +51,8 @@ function OCH.Common.AddToCCADodgeList()
 end
 
 function OCH.Common.Init()
-    OCH.Common.castSources = {}
-    OCH.Common.ResetCarrionStacks()
+    OCHStatusLabelCommon1:SetHidden(true)
+    OCHStatusLabelCommon1Value:SetHidden(true)
 end
 
 function OCH.Common.ProcessInterrupts(result, targetUnitId) 
